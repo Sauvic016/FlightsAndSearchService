@@ -2,11 +2,11 @@ const { CityRepository } = require("../repository/index");
 
 class CityService {
   constructor() {
-    // if (!CityService.instance) {
-    // CityService.instance = this;
-    this.cityRepository = new CityRepository();
-    // }
-    // return CityService.instance;
+    if (!CityService.instance) {
+      CityService.instance = this;
+      this.cityRepository = new CityRepository();
+    }
+    return CityService.instance;
   }
 
   async createCity(data) {

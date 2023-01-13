@@ -48,3 +48,10 @@ Relationship -> City has many airports and Airport belongs to a city (one to man
 npx sequelize model:generate --name Airport --attributes name:String,address:String,cityId:integer
 
 ```
+
+- To generate seeders for a particular model
+
+```
+npx sequelize seed:generate --name add-airplanes
+
+```
