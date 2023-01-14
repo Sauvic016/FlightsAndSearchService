@@ -8,13 +8,13 @@ router.post("/cities", CityController.createCities);
 router.delete("/city/:id", CityController.destroy);
 router.get("/city/:id", CityController.get);
 router.get("/city", CityController.getAll);
-router.get("/airports/city/:id", CityController.getAirportsOfaCity);
+router.get("/city/:id/airports", CityController.getAirportsOfaCity);
 router.patch("/city/:id", CityController.update);
 
-router.post("/airport", AirportController.create);
-router.get("/airport/:id", AirportController.get);
-router.patch("/airport/:id", AirportController.update);
-router.delete("/airport/:id", AirportController.destroy);
+router.post("/airports", AirportController.create);
+router.get("/airports/:id", AirportController.get);
+router.patch("/airports/:id", AirportController.update);
+router.delete("/airports/:id", AirportController.destroy);
 router.get("/airports", AirportController.getAll);
 
 router.post("/flights", FlightController.create);

@@ -4,7 +4,7 @@ const airportService = new AirportService();
 
 const create = async (req, res) => {
   try {
-    const airport = await airportService.createAirport(req.body);
+    const airport = await airportService.create(req.body);
     return res.status(201).json({
       data: airport,
       success: true,
@@ -24,7 +24,7 @@ const create = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const airport = await airportService.getAirport(req.params.id);
+    const airport = await airportService.get(req.params.id);
     return res.status(200).json({
       data: airport,
       success: true,
@@ -43,7 +43,7 @@ const get = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const response = await airportService.getAllAirports();
+    const response = await airportService.getAll();
     return res.status(200).json({
       data: response,
       success: true,
@@ -62,18 +62,18 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const airport = await airportService.updateAirport(req.body, req.params.id);
+    const airport = await airportService.update(req.params.id, req.body);
     return res.status(201).json({
       data: airport,
       success: true,
-      message: "Successfully updated an airport",
+      message: "Successfully updated the airport",
       err: {},
     });
   } catch (error) {
     return res.status(500).json({
       data: {},
       success: false,
-      message: "Failed to update an airport",
+      message: "Failed to update the airport",
       err: error,
     });
   }
@@ -81,18 +81,18 @@ const update = async (req, res) => {
 
 const destroy = async (req, res) => {
   try {
-    const result = await airportService.deleteAirport(req.params.id);
+    const result = await airportService.destroy(req.params.id);
     return res.status(200).json({
       data: result,
       success: true,
-      message: "Successfully deleted an airport",
+      message: "Successfully deleted the airport",
       err: {},
     });
   } catch (error) {
     return res.status(500).json({
       data: {},
       success: false,
-      message: "Failed to delete an airport",
+      message: "Failed to delete the airport",
       err: error,
     });
   }
