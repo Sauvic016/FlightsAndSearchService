@@ -1,5 +1,6 @@
 const { FlightRepository, AirplaneRepository } = require("../repository/index");
 const { compareTime } = require("../utils/helper");
+const CityService = require("./city-service");
 
 class FlightService {
   constructor() {
@@ -7,6 +8,7 @@ class FlightService {
       FlightService.instance = this;
       this.airplaneRepository = new AirplaneRepository();
       this.flightRepository = new FlightRepository();
+      this.cityService = new CityService();
     }
     return FlightService.instance;
   }
@@ -36,6 +38,26 @@ class FlightService {
     }
   }
 
+  async getAllFlights(data) {
+    try {
+      const departAirports = await this.cityService.getAirportsOfaCity(data.departureCityId);
+      const arrivalAirports = await this.cityService.getAirportsOfaCity(data.arrivalCityId);
+      const updatedData = {
+        arrivalAirportId: arrivalAirports.id,
+        departureAirportId: departAirports.id,
+        ...data,
+      };
+      const response = await this.getAllFlightData(updatedData);
+      const flights = response.filter((flight) => {
+        return data.date == JSON.stringify(flight["departureTime"]).split("T")[0].slice(1);
+      });
+
+      return flights;
+    } catch (error) {
+      console.log("Something went wrong in the service layer");
+      throw { error };
+    }
+  }
   async getFlight(flightId) {
     try {
       const flight = await this.flightRepository.getFlight(flightId);

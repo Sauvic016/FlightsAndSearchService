@@ -20,6 +20,19 @@ const validateCreateFlight = (req, res, next) => {
   next();
 };
 
+const validateGetFlight = (req, res, next) => {
+  if (!req.query.arrivalCityId || !req.query.departureCityId || !req.query.date) {
+    return res.status(ClientErrors.BAD_REQUEST).json({
+      data: {},
+      success: false,
+      message: "Invalid request body for get flights",
+      err: "Missing mandatory properties to get a flight",
+    });
+  }
+  next();
+};
+
 module.exports = {
   validateCreateFlight,
+  validateGetFlight,
 };
