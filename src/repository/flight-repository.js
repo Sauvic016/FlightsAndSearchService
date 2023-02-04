@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const { Flight } = require("../models/index");
+const { getPagingData } = require("../utils/helper");
 
 class FlightRepository {
   #createFilter(data) {
@@ -8,7 +9,7 @@ class FlightRepository {
       filter.arrivalAirportId = data.arrivalAirportId;
     }
     if (data.departureAirportId) {
-      filter.departureAirportId;
+      filter.departureAirportId = data.departureAirportId;
     }
     // if (data.minPrice && data.maxPrice) {
     //   Object.assign(filter, {
@@ -29,6 +30,12 @@ class FlightRepository {
       priceFilter.push({ price: { [Op.lte]: data.maxPrice } });
     }
     Object.assign(filter, { [Op.and]: priceFilter });
+
+    if (data.date) {
+      filter.departureTime = {
+        [Op.substring]: data.date,
+      };
+    }
 
     return filter;
   }
@@ -56,9 +63,17 @@ class FlightRepository {
   async getAllFlights(filter) {
     try {
       const filterObject = this.#createFilter(filter);
-      const flight = await Flight.findAll({
+      console.log(filter);
+      console.log(filterObject);
+      let limit = 6;
+      let page = filter?.page ? (filter.page > 0 ? filter.page : 1) : 1;
+      let offset = (page - 1) * limit;
+      let flight = await Flight.findAndCountAll({
         where: filterObject,
+        limit,
+        offset,
       });
+      flight = getPagingData(flight, page, limit);
       return flight;
     } catch (error) {
       console.log("Something went wrong in the repository layer");

@@ -42,16 +42,15 @@ class FlightService {
     try {
       const departAirports = await this.cityService.getAirportsOfaCity(data.departureCityId);
       const arrivalAirports = await this.cityService.getAirportsOfaCity(data.arrivalCityId);
-      const updatedData = {
-        arrivalAirportId: arrivalAirports.id,
-        departureAirportId: departAirports.id,
-        ...data,
-      };
-      const response = await this.getAllFlightData(updatedData);
-      const flights = response.filter((flight) => {
-        return data.date == JSON.stringify(flight["departureTime"]).split("T")[0].slice(1);
-      });
 
+      const departureAirportId = departAirports.map((item) => {
+        return item.id;
+      });
+      const arrivalAirportId = arrivalAirports.map((item) => {
+        return item.id;
+      });
+      const updatedData = { arrivalAirportId, departureAirportId, ...data };
+      const flights = await this.getAllFlightData(updatedData);
       return flights;
     } catch (error) {
       console.log("Something went wrong in the service layer");
