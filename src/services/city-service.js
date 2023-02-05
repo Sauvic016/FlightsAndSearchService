@@ -1,4 +1,5 @@
 const { CityRepository } = require("../repository/index");
+const { ServerError } = require("../utils/error/");
 
 class CityService {
   constructor() {
@@ -14,18 +15,23 @@ class CityService {
       const city = await this.cityRepository.createCity(data);
       return city;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 
   async deleteCity(cityId) {
     try {
-      const response = await this.cityRepository.deleteCity(cityId);
+      const getCity = await this.getCity(cityId);
+      const response = await this.cityRepository.deleteCity(getCity.id);
       return response;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 
@@ -34,8 +40,10 @@ class CityService {
       const city = await this.cityRepository.updateCity(cityId, data);
       return city;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
   async getCity(cityId) {
@@ -43,8 +51,10 @@ class CityService {
       const city = await this.cityRepository.getCity(cityId);
       return city;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
   async getAllCities(filter) {
@@ -52,8 +62,10 @@ class CityService {
       const cities = await this.cityRepository.getAllCities({ name: filter.name });
       return cities;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
   async createCities(data) {
@@ -61,21 +73,30 @@ class CityService {
       const filteredData = data.map((obj) => {
         return { name: obj.name };
       });
+      console.log(filteredData);
       const cities = await this.cityRepository.createCities(filteredData);
       return cities;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 
   async getAirportsOfaCity(id) {
     try {
       const airports = await this.cityRepository.getAirportsOfaCity(id);
+      console.log(airports);
+      if (!airports.length) {
+        throw new ServerError("Not able to fetch any airports", "The city does not have any registered airports");
+      }
       return airports;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 }

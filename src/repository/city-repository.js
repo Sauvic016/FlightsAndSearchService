@@ -1,4 +1,6 @@
 const { Op } = require("sequelize");
+const { StatusCodes } = require("http-status-codes");
+const { ClientError } = require("../utils/error/");
 
 const { City } = require("../models/index");
 
@@ -8,8 +10,15 @@ class CityRepository {
       const city = await City.create({ name });
       return city;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      if (error.name == "SequelizeUniqueConstraintError") {
+        throw new ClientError(
+          "UniqueConstraintError",
+          "City name already exists",
+          "City name should be unique",
+          StatusCodes.CONFLICT
+        );
+      }
+      throw error;
     }
   }
 
@@ -22,8 +31,7 @@ class CityRepository {
       });
       return true;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 
@@ -38,22 +46,27 @@ class CityRepository {
       // });
       //For getting updated data in mysql we use the below approach
       const city = await City.findByPk(cityId);
+      if (!city) {
+        throw new ClientError("CityNotFound", "Not able to update the city", "Invalid City id Provided");
+      }
       city.name = data.name;
       await city.save();
       return city;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 
   async getCity(cityId) {
     try {
       const city = await City.findByPk(cityId);
+      if (!city) {
+        throw new ClientError("CityNotFound", "Not able to get the city", "Invalid City id Provided");
+      }
       return city;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      console.log(error);
+      throw error;
     }
   }
 
@@ -68,13 +81,20 @@ class CityRepository {
             },
           },
         });
+
+        if (!cities.length) {
+          throw new ClientError(
+            "CitiesNotFound",
+            "Not able to get any city with this name",
+            "City with starting with this name does not exist"
+          );
+        }
         return cities;
       }
       const cities = await City.findAll();
       return cities;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
   async createCities(data) {
@@ -82,8 +102,15 @@ class CityRepository {
       const cities = await City.bulkCreate(data);
       return cities;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      if (error.name == "SequelizeUniqueConstraintError") {
+        throw new ClientError(
+          "UniqueConstraintError",
+          "These values already exists ",
+          "Cities name should be unique",
+          StatusCodes.CONFLICT
+        );
+      }
+      throw error;
     }
   }
 
@@ -93,8 +120,7 @@ class CityRepository {
       const airports = await city.getAirports();
       return airports;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 }
