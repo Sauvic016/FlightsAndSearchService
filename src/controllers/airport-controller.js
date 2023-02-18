@@ -28,15 +28,15 @@ const get = async (req, res) => {
     return res.status(200).json({
       data: airport,
       success: true,
-      message: "Successfully fetched an airport",
+      message: "Successfully fetched the airport",
       err: {},
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
-      message: "Failed to fetch an airport",
-      err: error,
+      message: "Failed to fetch the airport, Please check the airport details and try again",
+      err: error.explanation,
     });
   }
 };
@@ -55,7 +55,7 @@ const getAll = async (req, res) => {
       data: {},
       success: false,
       message: "Failed to fetch the airports",
-      err: error,
+      err: error.explanation,
     });
   }
 };
@@ -70,11 +70,11 @@ const update = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
       message: "Failed to update the airport",
-      err: error,
+      err: error.explanation,
     });
   }
 };

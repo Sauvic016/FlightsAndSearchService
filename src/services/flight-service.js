@@ -1,6 +1,7 @@
 const { FlightRepository, AirplaneRepository } = require("../repository/index");
-const { compareTime } = require("../utils/helper");
 const CityService = require("./city-service");
+const { compareTime } = require("../utils/helper");
+const { ServerError, ClientError } = require("../utils/error");
 
 class FlightService {
   constructor() {
@@ -15,16 +16,35 @@ class FlightService {
   async createFlight(data) {
     try {
       if (!compareTime(data.arrivalTime, data.departureTime)) {
-        throw {
-          error: "Arrival time cannot be less than departure time",
-        };
+        throw new ClientError(
+          "TravelTimeError",
+          "Arrival time cannot be less than departure time",
+          "Departure time should always be less than Arrival time"
+        );
       }
       const airplane = await this.airplaneRepository.getAirplane(data.airplaneId);
       const flight = await this.flightRepository.createFlight({ ...data, totalSeats: airplane.capacity });
       return flight;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
+    }
+  }
+
+  async getFlight(flightId) {
+    try {
+      const flight = await this.flightRepository.getFlight(flightId);
+      if (!flight) {
+        throw new ClientError("FlightNotFound", "Invalid Flight Id", "Flight does not exist for this id");
+      }
+      return flight;
+    } catch (error) {
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 
@@ -34,11 +54,11 @@ class FlightService {
       return flights;
     } catch (error) {
       console.log("Something went wrong in the service layer");
-      throw { error };
+      throw new ServerError();
     }
   }
 
-  async getAllFlights(data) {
+  async getFlights(data) {
     try {
       const departAirports = await this.cityService.getAirportsOfaCity(data.departureCityId);
       const arrivalAirports = await this.cityService.getAirportsOfaCity(data.arrivalCityId);
@@ -53,26 +73,24 @@ class FlightService {
       const flights = await this.getAllFlightData(updatedData);
       return flights;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
-  async getFlight(flightId) {
-    try {
-      const flight = await this.flightRepository.getFlight(flightId);
-      return flight;
-    } catch (error) {
-      console.log("Something went wrong in the service layer");
-      throw { error };
-    }
-  }
+
   async updateFlight(flightId, data) {
     try {
-      const response = await this.flightRepository.updateFlight(flightId, data);
+      const validFlight = await this.getFlight(flightId);
+      const response = await this.flightRepository.updateFlight(validFlight.id, data);
       return response;
     } catch (error) {
       console.log("Something went wrong in the service layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 }

@@ -22,12 +22,11 @@ const create = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
-      message: "Not able to create a flight",
-      err: error,
+      message: error.message,
+      err: error.explanation,
     });
   }
 };
@@ -42,19 +41,18 @@ const getAll = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
-      message: "Not able to fetch the flights",
-      err: error,
+      message: error.message,
+      err: error.explanation,
     });
   }
 };
 
 const getFlights = async (req, res) => {
   try {
-    const response = await flightService.getAllFlights(req.query);
+    const response = await flightService.getFlights(req.query);
     return res.status(SuccessCodes.OK).json({
       data: response,
       success: true,
@@ -62,12 +60,11 @@ const getFlights = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
-      message: "Not able to fetch the flights",
-      err: error,
+      message: error.message,
+      err: error.explanation,
     });
   }
 };
@@ -82,12 +79,11 @@ const get = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
-      message: "Not able to fetch the flight",
-      err: error,
+      message: error.message,
+      err: error.explanation,
     });
   }
 };
@@ -101,12 +97,11 @@ const update = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+    return res.status(error.statusCode).json({
       data: {},
       success: false,
-      message: "Not able to update the flight",
-      err: error,
+      message: error.message,
+      err: error.explanation,
     });
   }
 };

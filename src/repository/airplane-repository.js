@@ -1,13 +1,20 @@
 const { Airplane } = require("../models/index");
+const { ClientError, ServerError } = require("../utils/error");
 
 class AirplaneRepository {
   async getAirplane(id) {
     try {
       const airport = await Airplane.findByPk(id);
+      if (!airport) {
+        throw new ClientError("AirplaneNotFoundError", "Invalid Airplane Id", "Requested Airplane does not exist");
+      }
       return airport;
     } catch (error) {
       console.log("Something went wrong in the repository layer");
-      throw { error };
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 }

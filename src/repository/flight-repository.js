@@ -1,6 +1,8 @@
 const { Op } = require("sequelize");
+const { StatusCodes } = require("http-status-codes");
 const { Flight } = require("../models/index");
 const { getPagingData } = require("../utils/helper");
+const { ClientError } = require("../utils/error");
 
 class FlightRepository {
   #createFilter(data) {
@@ -45,8 +47,16 @@ class FlightRepository {
       const flight = await Flight.create(data);
       return flight;
     } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError") {
+        throw new ClientError(
+          "UniqueConstraintError",
+          "Flight name already exists",
+          "Flight name should be unique",
+          StatusCodes.CONFLICT
+        );
+      }
       console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 
@@ -56,7 +66,7 @@ class FlightRepository {
       return flight;
     } catch (error) {
       console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 
@@ -77,7 +87,7 @@ class FlightRepository {
       return flight;
     } catch (error) {
       console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 
@@ -91,7 +101,7 @@ class FlightRepository {
       return true;
     } catch (error) {
       console.log("Something went wrong in the repository layer");
-      throw { error };
+      throw error;
     }
   }
 }

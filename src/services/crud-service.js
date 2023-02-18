@@ -1,3 +1,5 @@
+const { ServerError, ClientError } = require("../utils/error/");
+
 class CrudService {
   constructor(repository) {
     if (!CrudService.instance) {
@@ -11,8 +13,7 @@ class CrudService {
       const response = await this.repository.create(data);
       return response;
     } catch (error) {
-      console.log("something went wrong in crud service");
-      throw error;
+      throw new ServerError();
     }
   }
 
@@ -21,18 +22,22 @@ class CrudService {
       const response = await this.repository.destroy(id);
       return response;
     } catch (error) {
-      console.log("something went wrong in crud service");
-      throw error;
+      throw new ServerError();
     }
   }
 
   async get(id) {
     try {
       const response = await this.repository.get(id);
+      if (!response) {
+        throw new ClientError();
+      }
       return response;
     } catch (error) {
-      console.log("something went wrong in crud service");
-      throw error;
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 
@@ -41,18 +46,20 @@ class CrudService {
       const response = await this.repository.getAll();
       return response;
     } catch (error) {
-      console.log("something went wrong in crud service");
-      throw error;
+      throw new ServerError();
     }
   }
 
   async update(id, data) {
     try {
-      const response = await this.repository.update(id, data);
+      const checkdata = await this.get(id);
+      const response = await this.repository.update(checkdata.id, data);
       return response;
     } catch (error) {
-      console.log("something went wrong in crud service");
-      throw error;
+      if (error.name) {
+        throw error;
+      }
+      throw new ServerError();
     }
   }
 }
