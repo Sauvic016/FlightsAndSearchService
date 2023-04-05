@@ -1,4 +1,4 @@
-const { FlightRepository, AirplaneRepository } = require("../repository/index");
+const { FlightRepository, AirplaneRepository, AirportRepository } = require("../repository/index");
 const CityService = require("./city-service");
 const { compareTime } = require("../utils/helper");
 const { ServerError, ClientError } = require("../utils/error");
@@ -8,8 +8,9 @@ class FlightService {
     if (!FlightService.instance) {
       FlightService.instance = this;
       this.airplaneRepository = new AirplaneRepository();
-      this.flightRepository = new FlightRepository();
+      this.airportRepository = new AirportRepository();
       this.cityService = new CityService();
+      this.flightRepository = new FlightRepository();
     }
     return FlightService.instance;
   }
@@ -39,7 +40,19 @@ class FlightService {
       if (!flight) {
         throw new ClientError("FlightNotFound", "Invalid Flight Id", "Flight does not exist for this id");
       }
-      return flight;
+      const result = await Promise.all([
+        this.airportRepository.get(flight.arrivalAirportId),
+        this.airportRepository.get(flight.departureAirportId),
+      ]);
+      const [arrivalCityId, departureCityId] = result.map((item) => item.cityId);
+      const cityresult = await Promise.all([
+        this.cityService.getCity(arrivalCityId),
+        this.cityService.getCity(departureCityId),
+      ]);
+
+      const [arrivalAirport, departureAirport] = result.map((item) => item.name);
+      const [arrivalCity, departureCity] = cityresult.map((item) => item.name);
+      return { ...flight.dataValues, arrivalAirport, departureAirport, arrivalCity, departureCity };
     } catch (error) {
       if (error.name) {
         throw error;
@@ -53,7 +66,6 @@ class FlightService {
       const flights = await this.flightRepository.getAllFlights(data);
       return flights;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
       throw new ServerError();
     }
   }
@@ -86,7 +98,6 @@ class FlightService {
       const response = await this.flightRepository.updateFlight(validFlight.id, data);
       return response;
     } catch (error) {
-      console.log("Something went wrong in the service layer");
       if (error.name) {
         throw error;
       }
