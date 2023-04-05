@@ -73,7 +73,6 @@ class CityService {
       const filteredData = data.map((obj) => {
         return { name: obj.name };
       });
-      console.log(filteredData);
       const cities = await this.cityRepository.createCities(filteredData);
       return cities;
     } catch (error) {
@@ -87,7 +86,6 @@ class CityService {
   async getAirportsOfaCity(id) {
     try {
       const airports = await this.cityRepository.getAirportsOfaCity(id);
-      console.log(airports);
       if (!airports.length) {
         throw new ServerError("Not able to fetch any airports", "The city does not have any registered airports");
       }

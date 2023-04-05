@@ -13,7 +13,6 @@ const create = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
     return res.status(error.statusCode).json({
       data: {},
       success: false,
@@ -25,7 +24,6 @@ const create = async (req, res) => {
 
 const destroy = async (req, res) => {
   try {
-    console.log(req.params.id);
     const response = await cityService.deleteCity(req.params.id);
     return res.status(StatusCodes.OK).json({
       data: response,
@@ -34,7 +32,6 @@ const destroy = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
     return res.status(error.statusCode).json({
       data: {},
       success: false,
@@ -45,7 +42,6 @@ const destroy = async (req, res) => {
 };
 const get = async (req, res) => {
   try {
-    console.log(req.params.id);
     const response = await cityService.getCity(req.params.id);
     return res.status(StatusCodes.OK).json({
       data: response,
@@ -92,7 +88,6 @@ const getAll = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    console.log(error);
     return res.status(error.statusCode).json({
       data: {},
       success: false,

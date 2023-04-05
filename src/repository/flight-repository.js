@@ -55,7 +55,6 @@ class FlightRepository {
           StatusCodes.CONFLICT
         );
       }
-      console.log("Something went wrong in the repository layer");
       throw error;
     }
   }
@@ -65,7 +64,6 @@ class FlightRepository {
       const flight = await Flight.findByPk(flightId);
       return flight;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
       throw error;
     }
   }
@@ -73,8 +71,6 @@ class FlightRepository {
   async getAllFlights(filter) {
     try {
       const filterObject = this.#createFilter(filter);
-      console.log(filter);
-      console.log(filterObject);
       let limit = 6;
       let page = filter?.page ? (filter.page > 0 ? filter.page : 1) : 1;
       let offset = (page - 1) * limit;
@@ -86,7 +82,6 @@ class FlightRepository {
       flight = getPagingData(flight, page, limit);
       return flight;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
       throw error;
     }
   }
@@ -100,7 +95,6 @@ class FlightRepository {
       });
       return true;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
       throw error;
     }
   }

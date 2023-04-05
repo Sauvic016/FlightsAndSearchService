@@ -10,7 +10,6 @@ class AirplaneRepository {
       }
       return airport;
     } catch (error) {
-      console.log("Something went wrong in the repository layer");
       if (error.name) {
         throw error;
       }
